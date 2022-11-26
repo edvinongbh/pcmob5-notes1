@@ -5,14 +5,38 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Keyboard,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PROFILE_SCREEN } from "../constants";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const API = "https://pcmob5-blog-api.edvino1.repl.co";
+const API_LOGIN = "/auth";
+
+export const LOGIN_SCREEN = "LOGIN_SCREEN";
 
 export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
+  const [errorText, setErrorText] = useState("");
+
+  async function login() {
+    Keyboard.dismiss();
+    try {
+      const response = await axios.post(API + API_LOGIN, {
+        username,
+        password,
+      });
+      await AsyncStorage.setItem("token", response.data.access_token);
+      navigation.navigate(PROFILE_SCREEN);
+    } catch (error) {
+      console.log(error.response);
+      setErrorText(error.response.data.description);
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -35,19 +59,24 @@ export default function LoginScreen() {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => {
+        onPress={async () => {
           navigation.navigate(PROFILE_SCREEN);
         }}
       >
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
+      <Text style={styles.errorText}>{errorText}</Text>
     </View>
   );
 }
 
-export const LOGIN_SCREEN = "LOGIN_SCREEN";
-
 const styles = StyleSheet.create({
+  errorText: {
+    marginTop: 20,
+    fontSize: 15,
+    color: "red",
+  },
+
   container: {
     flex: 1,
     backgroundColor: "#fff",
