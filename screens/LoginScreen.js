@@ -63,7 +63,7 @@ export default function LoginScreen() {
       />
 
       <TouchableOpacity
-        style={styles.Button}
+        style={styles.button}
         onPress={async () => {
           await login();
         }}
