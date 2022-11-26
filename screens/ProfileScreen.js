@@ -1,10 +1,9 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOGIN_SCREEN } from "../constants";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-// TODO: Change to your user name
 
 const API = "https://pcmob5-blog-api.edvino1.repl.co";
 const API_WHOAMI = "/whoami";
@@ -12,6 +11,7 @@ const API_WHOAMI = "/whoami";
 export default function ProfileScreen() {
   const navigation = useNavigation();
   const [username, setUsername] = useState("loading...");
+
   async function loadUsername() {
     const token = await AsyncStorage.getItem("token");
     try {
@@ -23,11 +23,13 @@ export default function ProfileScreen() {
       console.log(error.response.data);
     }
   }
+
   useEffect(() => {
     const removeListener = navigation.addListener("focus", loadUsername);
     loadUsername();
     return () => removeListener();
   }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>profile</Text>
@@ -40,6 +42,7 @@ export default function ProfileScreen() {
         onPress={() => {
           navigation.navigate(LOGIN_SCREEN);
           AsyncStorage.removeItem("token");
+          setUsername("loading..");
         }}
       >
         <Text style={styles.buttonText}>Logout</Text>
@@ -47,6 +50,7 @@ export default function ProfileScreen() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

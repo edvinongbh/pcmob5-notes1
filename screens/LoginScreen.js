@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PROFILE_SCREEN } from "../constants";
@@ -22,8 +23,10 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
   const [errorText, setErrorText] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function login() {
+    setLoading(true);
     Keyboard.dismiss();
     try {
       const response = await axios.post(API + API_LOGIN, {
@@ -31,6 +34,8 @@ export default function LoginScreen() {
         password,
       });
       await AsyncStorage.setItem("token", response.data.access_token);
+      setErrorText("");
+      setLoading(false);
       navigation.navigate(PROFILE_SCREEN);
     } catch (error) {
       console.log(error.response);
@@ -60,10 +65,14 @@ export default function LoginScreen() {
       <TouchableOpacity
         style={styles.button}
         onPress={async () => {
-          navigation.navigate(PROFILE_SCREEN);
+          await login();
         }}
       >
-        <Text style={styles.buttonText}>Login</Text>
+        {loading ? (
+          <ActivityIndicator style={styles.buttonText} />
+        ) : (
+          <Text style={styles.buttonText}>Login</Text>
+        )}
       </TouchableOpacity>
       <Text style={styles.errorText}>{errorText}</Text>
     </View>
