@@ -38,7 +38,7 @@ export default function ProfileScreen() {
       </Text>
       <View style={{ flex: 1 }} />
       <TouchableOpacity
-        style={styles.button}
+        style={styles.Button}
         onPress={() => {
           navigation.navigate(LOGIN_SCREEN);
           AsyncStorage.removeItem("token");
