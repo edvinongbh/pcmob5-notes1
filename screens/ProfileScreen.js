@@ -1,16 +1,38 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOGIN_SCREEN } from "../constants";
+import axios from "axios";
+// TODO: Change to your user name
+
+const API = "https://pcmob5-blog-api.edvino1.repl.co";
+const API_WHOAMI = "/whoami";
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
+  const [username, setUsername] = useState("loading...");
+  async function loadUsername() {
+    const token = await AsyncStorage.getItem("token");
+    try {
+      const response = await axios.get(API + API_WHOAMI, {
+        headers: { Authorization: `JWT ${token}` },
+      });
+      setUsername(response.data.username);
+    } catch (error) {
+      console.log(error.response.data);
+    }
+  }
+  useEffect(() => {
+    const removeListener = navigation.addListener("focus", loadUsername);
+    loadUsername();
+    return () => removeListener();
+  }, []);
   return (
     <View style={styles.container}>
       <Text style={styles.title}>profile</Text>
       <Text style={{ fontSize: 20, fontWeight: "700", marginBottom: 10 }}>
-        your user name
+        your user name: {username}
       </Text>
       <View style={{ flex: 1 }} />
       <TouchableOpacity
@@ -25,7 +47,6 @@ export default function ProfileScreen() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
